@@ -1,0 +1,124 @@
+@font-face { /*light*/
+    font-family: "Open Sans";
+    src: local("Open Sans"), url("fonts/opensans300.ttf") format("truetype");
+    font-weight: 300;
+}
+@font-face { /*normal*/
+    font-family: "Open Sans";
+    src: local("Open Sans"), url("fonts/opensans400.ttf") format("truetype");
+    font-weight: 400;
+}
+@font-face { /*semi-bold*/
+    font-family: "Open Sans";
+    src: local("Open Sans"), url("fonts/opensans600.ttf") format("truetype");
+    font-weight: 600;
+}
+@font-face { /*bold*/
+    font-family: "Open Sans";
+    src: local("Open Sans"), url("fonts/opensans700.ttf") format("truetype");
+    font-weight: 700;
+}
+
+:root {
+    --menu-width: 480px;
+    --global-font-family: "Open Sans";
+    --accent-a: rgb(232,118,0);
+    --accent-b: rgb(199,64,0);
+    --accent-c: rgb(255,102,0);
+    --pane-color: rgb(224,224,224);
+    --highlight-color : rgb(192,192,192);
+    --control-color: rgb(176,176,176);
+    --global-font-size: 15px;
+
+    --iconbar-bg: linear-gradient(to bottom, var(--accent-b)0%, var(--accent-a)92%, var(--accent-b)100%);
+    --floating-bg: linear-gradient(to bottom, var(--accent-b)0%, var(--accent-a)2%, var(--accent-b)100%);
+    
+    --bg-light:
+    linear-gradient(158deg,rgba(84,84,84,.02) 0%,rgba(84,84,84,.02) 20%,rgba(219,219,219,.02) 20%,rgba(219,219,219,.02) 40%,rgba(54,54,54,.02) 40%,rgba(54,54,54,.02) 60%,rgba(99,99,99,.02) 60%,rgba(99,99,99,.02) 80%,rgba(92,92,92,.02) 80%,rgba(92,92,92,.02) 100%),
+    linear-gradient(45deg,rgba(221,221,221,.01) 0%,rgba(221,221,221,.01) 14%,rgba(8,8,8,.01) 14%,rgba(8,8,8,.01) 28.5%,rgba(52,52,52,.01) 28.5%,rgba(52,52,52,.01) 42.858%,rgba(234,234,234,.01) 42.858%,rgba(234,234,234,.01) 57.144%,rgba(81,81,81,.01) 57.144%,rgba(81,81,81,.01) 71.43%,rgba(239,239,239,.01) 71.43%,rgba(239,239,239,.01) 85%,rgba(187,187,187,.01) 85%,rgba(187,187,187,.01) 100.1%),
+    linear-gradient(109deg,rgba(33,33,33,.02) 0%,rgba(33,33,33,.02) 12.5%,rgba(147,147,147,.02) 12.5%,rgba(147,147,147,.02) 25%,rgba(131,131,131,.02) 25%,rgba(131,131,131,.02) 37.5%,rgba(151,151,151,.02) 37.5%,rgba(151,151,151,.02) 50%,rgba(211,211,211,.02) 50%,rgba(211,211,211,.02) 62.5%,rgba(39,39,39,.02) 62.5%,rgba(39,39,39,.02) 75%,rgba(55,55,55,.02) 75%,rgba(55,55,55,.02) 87.5%,rgba(82,82,82,.02) 87.5%,rgba(82,82,82,.02) 100%),
+    linear-gradient(348deg,rgba(42,42,42,.01) 0%,rgba(42,42,42,.01) 20%,rgba(8,8,8,.01) 20%,rgba(8,8,8,.01) 40%,rgba(242,242,242,.01) 40%,rgba(242,242,242,.01) 60%,rgba(42,42,42,.01) 60%,rgba(42,42,42,.01) 80%,rgba(80,80,80,.01) 80%,rgba(80,80,80,.01) 100%),
+    linear-gradient(120deg,rgba(106,106,106,.02) 0%,rgba(106,106,106,.02) 14%,rgba(67,67,67,.02) 14%,rgba(67,67,67,.02) 28.5%,rgba(134,134,134,.02) 28.5%,rgba(134,134,134,.02) 42.858%,rgba(19,19,19,.02) 42.858%,rgba(19,19,19,.02) 57.144%,rgba(101,101,101,.02) 57.144%,rgba(101,101,101,.02) 71.43%,rgba(205,205,205,.02) 71.43%,rgba(205,205,205,.02) 85%,rgba(53,53,53,.02) 85%,rgba(53,53,53,.02) 100.1%),
+    linear-gradient(45deg,rgba(214,214,214,.02) 0%,rgba(214,214,214,.02) 16.6%,rgba(255,255,255,.02) 16.6%,rgba(255,255,255,.02) 33%,rgba(250,250,250,.02) 33%,rgba(250,250,250,.02) 50.001%,rgba(231,231,231,.02) 50.001%,rgba(231,231,231,.02) 66.668%,rgba(241,241,241,.02) 66.668%,rgba(241,241,241,.02) 83%,rgba(31,31,31,.02) 83%,rgba(31,31,31,.02) 100.1%),
+    linear-gradient(59deg,rgba(224,224,224,.02) 0%,rgba(224,224,224,.02) 12.5%,rgba(97,97,97,.02) 12.5%,rgba(97,97,97,.02) 25%,rgba(143,143,143,.02) 25%,rgba(143,143,143,.02) 37.5%,rgba(110,110,110,.02) 37.5%,rgba(110,110,110,.02) 50%,rgba(34,34,34,.02) 50%,rgba(34,34,34,.02) 62.5%,rgba(155,155,155,.02) 62.5%,rgba(155,155,155,.02) 75%,rgba(249,249,249,.02) 75%,rgba(249,249,249,.02) 87.5%,rgba(179,179,179,.02) 87.5%,rgba(179,179,179,.02) 100%),
+    linear-gradient(241deg,rgba(58,58,58,.01) 0%,rgba(58,58,58,.01) 25%,rgba(124,124,124,.01) 25%,rgba(124,124,124,.01) 50%,rgba(254,254,254,.01) 50%,rgba(254,254,254,.01) 75%,rgba(52,52,52,.01) 75%,rgba(52,52,52,.01) 100%),
+    radial-gradient(ellipse at center, rgb(220,225,230) 0%,rgb(200,215,220) 100%);
+
+    --bg-dark:
+    linear-gradient(158deg,rgba(84,84,84,.02) 0%,rgba(84,84,84,.02) 20%,rgba(219,219,219,.02) 20%,rgba(219,219,219,.02) 40%,rgba(54,54,54,.02) 40%,rgba(54,54,54,.02) 60%,rgba(99,99,99,.02) 60%,rgba(99,99,99,.02) 80%,rgba(92,92,92,.02) 80%,rgba(92,92,92,.02) 100%),
+    linear-gradient(45deg,rgba(221,221,221,.01) 0%,rgba(221,221,221,.01) 14%,rgba(8,8,8,.01) 14%,rgba(8,8,8,.01) 28.5%,rgba(52,52,52,.01) 28.5%,rgba(52,52,52,.01) 42.858%,rgba(234,234,234,.01) 42.858%,rgba(234,234,234,.01) 57.144%,rgba(81,81,81,.01) 57.144%,rgba(81,81,81,.01) 71.43%,rgba(239,239,239,.01) 71.43%,rgba(239,239,239,.01) 85%,rgba(187,187,187,.01) 85%,rgba(187,187,187,.01) 100.1%),
+    linear-gradient(109deg,rgba(33,33,33,.02) 0%,rgba(33,33,33,.02) 12.5%,rgba(147,147,147,.02) 12.5%,rgba(147,147,147,.02) 25%,rgba(131,131,131,.02) 25%,rgba(131,131,131,.02) 37.5%,rgba(151,151,151,.02) 37.5%,rgba(151,151,151,.02) 50%,rgba(211,211,211,.02) 50%,rgba(211,211,211,.02) 62.5%,rgba(39,39,39,.02) 62.5%,rgba(39,39,39,.02) 75%,rgba(55,55,55,.02) 75%,rgba(55,55,55,.02) 87.5%,rgba(82,82,82,.02) 87.5%,rgba(82,82,82,.02) 100%),
+    linear-gradient(348deg,rgba(42,42,42,.01) 0%,rgba(42,42,42,.01) 20%,rgba(8,8,8,.01) 20%,rgba(8,8,8,.01) 40%,rgba(242,242,242,.01) 40%,rgba(242,242,242,.01) 60%,rgba(42,42,42,.01) 60%,rgba(42,42,42,.01) 80%,rgba(80,80,80,.01) 80%,rgba(80,80,80,.01) 100%),
+    linear-gradient(120deg,rgba(106,106,106,.02) 0%,rgba(106,106,106,.02) 14%,rgba(67,67,67,.02) 14%,rgba(67,67,67,.02) 28.5%,rgba(134,134,134,.02) 28.5%,rgba(134,134,134,.02) 42.858%,rgba(19,19,19,.02) 42.858%,rgba(19,19,19,.02) 57.144%,rgba(101,101,101,.02) 57.144%,rgba(101,101,101,.02) 71.43%,rgba(205,205,205,.02) 71.43%,rgba(205,205,205,.02) 85%,rgba(53,53,53,.02) 85%,rgba(53,53,53,.02) 100.1%),
+    linear-gradient(45deg,rgba(214,214,214,.02) 0%,rgba(214,214,214,.02) 16.6%,rgba(255,255,255,.02) 16.6%,rgba(255,255,255,.02) 33%,rgba(250,250,250,.02) 33%,rgba(250,250,250,.02) 50.001%,rgba(231,231,231,.02) 50.001%,rgba(231,231,231,.02) 66.668%,rgba(241,241,241,.02) 66.668%,rgba(241,241,241,.02) 83%,rgba(31,31,31,.02) 83%,rgba(31,31,31,.02) 100.1%),
+    linear-gradient(59deg,rgba(224,224,224,.02) 0%,rgba(224,224,224,.02) 12.5%,rgba(97,97,97,.02) 12.5%,rgba(97,97,97,.02) 25%,rgba(143,143,143,.02) 25%,rgba(143,143,143,.02) 37.5%,rgba(110,110,110,.02) 37.5%,rgba(110,110,110,.02) 50%,rgba(34,34,34,.02) 50%,rgba(34,34,34,.02) 62.5%,rgba(155,155,155,.02) 62.5%,rgba(155,155,155,.02) 75%,rgba(249,249,249,.02) 75%,rgba(249,249,249,.02) 87.5%,rgba(179,179,179,.02) 87.5%,rgba(179,179,179,.02) 100%),
+    linear-gradient(241deg,rgba(58,58,58,.01) 0%,rgba(58,58,58,.01) 25%,rgba(124,124,124,.01) 25%,rgba(124,124,124,.01) 50%,rgba(254,254,254,.01) 50%,rgba(254,254,254,.01) 75%,rgba(52,52,52,.01) 75%,rgba(52,52,52,.01) 100%),
+    linear-gradient(rgb(64,64,64) 0%,rgb(64,64,64) 100%);
+}
+
+.disable-animation *,
+.disable-animation *::before,
+.disable-animation *::after {
+    transition: 0s !important;
+    animation: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --pane-color: rgb(192,192,192);
+        --highlight-color: rgb(176,176,176);
+        --control-color: rgb(156,156,156);
+    }
+}
+
+body {
+    background-color: #202020;
+    color: #c0c0c0;
+
+    font-size: var(--global-font-size);
+    font-family: var(--global-font-family);
+
+    overflow: hidden !important;
+
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+a {
+    color: #202020;
+    font-weight: 600;
+}
+
+::selection {
+    background: #222;
+    color: #fff;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #777;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+@media print {
+    body {
+        display: none;
+    }
+}

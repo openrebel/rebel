@@ -1,0 +1,227 @@
+#container {
+    background: var(--bg-light);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 56px;
+
+    overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+    #container {
+        background: var(--bg-dark);
+    }
+}
+
+#iconsbar {
+    background: var(--iconbar-bg);
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 56px;
+}
+
+
+#floatingbutton {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 48px;
+    height: 48px;
+    z-index: 16777271;
+
+    overflow: hidden;
+    border-radius: 4px 8px 48px 8px;
+    background: var(--floating-bg);
+    box-shadow: rgba(0,0,0,.2) 2px 2px 2px;
+
+    transition:
+        filter .4s,
+        border-radius .4s,
+        width .2s,
+        height .2s;
+}
+
+#logo {
+    position: relative;
+    left: 8px;
+    top: 6px;
+    width: 26px;
+    height: 26px;
+    transform-origin: 0 0;
+    background-image: url(res/logo.svg);
+    background-size: cover;
+
+    transition: .2s;
+    transition-delay: .08s;
+}
+
+#menu {
+    background: var(--bg-light);
+    background: #202020;
+    position: absolute;
+
+    border-radius: 4px;
+    left: 16px;
+    top: 16px;
+    bottom: 16px;
+    z-index: 16777270;
+    width: var(--menu-width);
+    overflow: hidden;
+
+    visibility: hidden;
+    transition: .2s;
+}
+
+#searchbox {    
+    position: absolute;
+    left: 32px;
+    right: 32px;
+    top: 32px;
+    height: 36px;
+
+    cursor: text;
+    border: #c0c0c0 1px solid;
+    border-radius: 4px;
+}
+
+#searchbox > #imgSearch {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 28px;
+    height: 28px;
+    background-image: url(res/search.svg);
+    background-size: cover;
+    filter: invert(1);
+}
+
+#searchbox > input[type=text] {
+    position: absolute;
+    left: 40px;
+    top: 0px;
+    width: calc(100% - 80px);
+    background-color: transparent;
+    font-size: 22px;
+    color: #c0c0c0;
+
+    outline: none;
+    border-width: initial;
+    border-style: none;
+    border-color: initial;
+    border-image: initial;
+    padding: 1px 0px 2px 0px !important;
+    margin: 2px 0px !important;
+
+    animation: none;
+}
+
+#searchbox > input[type=text]::selection {
+    background: #444;
+    color: #fff;
+}
+
+#searchbox > #btnSearchClear {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: default;
+    background-image: url(res/delete.svg);
+    background-size: 20px 20px;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    filter: invert(1);
+
+    transition: .1s;
+}
+
+#searchbox > #btnSearchClear:hover {
+    background-color: #bbb;
+}
+
+#searchbox > #btnSearchClear:active {
+    background-color: #ccc;
+}
+
+#menulist {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 48px;
+    top: 80px;
+
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+#btnSettings, #btnLogout {
+    position: absolute;
+    width: 40px;
+    height: 38px;
+    bottom: 4px;
+    margin: 2px;
+    background-color: #c0c0c0;
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+    background-position: 50% 50%;
+    border-radius: 4px;
+    transition: .2s;
+}
+
+#btnSettings {
+    right: 52px;
+    background-image: url(res/wrench.svg);
+}
+#btnLogout {
+    right: 4px;
+    background-image: url(res/logoff.svg);
+}
+
+#btnSettings:hover, #btnLogout:hover {
+    background-color: #d0d0d0;
+}
+
+#btnSettings:active, #btnLogout:active {
+    background-color: #808080;
+}
+
+#cap {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #202020;
+    z-index: 16777269;
+    transition: .1s;
+    visibility: hidden;
+}
+
+@media (prefers-color-scheme: light) {
+    #cap {
+        background-color: #c0c0c0;
+    }
+    #menu {
+        background: #303030;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    #cap {
+        visibility: hidden !important;
+    }
+    #menu {
+        left: 0 !important;
+        right: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+}

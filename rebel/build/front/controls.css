@@ -1,0 +1,220 @@
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="color"] {
+    font-size: var(--global-font-size);
+    font-family: var(--global-font-family);
+    background-color: rgb(96,96,96);
+    color: rgb(224,224,224);
+    outline: 0;
+    border: 0;
+    min-width: 72px;
+    height: 28px;
+    margin: 4px;
+    border-radius: 4px;
+    
+    transition: .15s;
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="color"]:hover {
+    background-color: rgb(112,112,112);
+}
+
+button:focus,
+input[type="button"]:focus,
+input[type="submit"]:focus,
+input[type="reset"]:focus,
+input[type="color"]:focus {
+    animation: inner-glow 2s infinite linear;
+}
+
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active,
+input[type="reset"]:active,
+input[type="color"]:active {
+    background-color: rgb(128,128,128);
+}
+
+button:disabled,
+input[type="button"]:disabled,
+input[type="submit"]:disabled,
+input[type="reset"]:disabled,
+input[type="color"]:disabled {
+    opacity: .8;
+    background-color: rgb(96,96,96) !important;
+}
+
+
+input[type="text"],
+input[type="search"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+textarea,
+select {
+    font-size: var(--global-font-size);
+    font-family: var(--global-font-family);
+    outline: 0;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--control-color);
+    padding: 4px 8px;
+    margin: 2px 4px;
+    transition: .2s;
+}
+
+select {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+input[type="text"]:focus,
+input[type="search"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus {
+    animation: inner-glow 2s infinite linear;
+}
+
+input[type="password"]{
+    background-image: url(res/credencial.svg);
+    background-repeat: no-repeat;
+    background-size: 18px 18px;
+    background-position: calc(100% + 18px) center;
+}
+
+input[type="password"]:placeholder-shown {
+    background-position: calc(100% - 4px) center;
+}
+
+input[type="text"]:disabled,
+input[type="search"]:disabled,
+input[type="password"]:disabled,
+input[type="email"]:disabled,
+input[type="number"]:disabled,
+input[type="date"]:disabled,
+textarea:disabled,
+select:disabled {
+    opacity: .8;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    height: 14px;
+    border-radius: 4px;
+    background-color: var(--control-color);
+    outline: none;
+}
+
+input[type="range"]::-ms-slider-thumb {
+    background-color: #FF6600;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    outline: none;
+    border-radius: 4px;
+    background-color: var(--accent-c);
+    box-shadow: rgba(0,0,0,.5) -1px 0 2px;
+    transition: transform .2s;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    outline: none;
+    border-radius: 4px;
+    background: var(--accent-c);
+    box-shadow: rgba(0,0,0,.5) -1px 0 2px;
+    transition: transform .2s;
+}
+
+input[type="range"]:focus {
+    animation: inner-glow 2s infinite linear;
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb {
+    background-color: rgb(128,128,128) !important;
+    opacity: .8;
+}
+input[type="range"]:disabled::-moz-range-thumb {
+    background-color: rgb(128,128,128) !important;
+    opacity: .8;
+}
+
+input[type="checkbox"] {
+    display: none;
+}
+
+label {
+    display: inline-block;
+    text-align: left;
+    min-width: 64px;
+    position: relative;
+    padding-left: 38px;
+    border: 0;
+    outline: 0;
+}
+
+label::before {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 28px;
+    height: 16px;
+    content: " ";
+    border-radius: 4px;
+    background-color: var(--control-color);
+    transition: .2s;
+}
+
+label::after {
+    content: " ";
+    position: absolute;
+    top: 3px;
+    left: -1px;
+    width: 14px;
+    height: 14px;
+    margin: 2px 2px;
+
+    border-radius: 4px;
+    background-color: rgb(96,96,96);
+
+    transition: transform .2s,
+                background-color .4s;
+}
+
+label:focus::before {
+    animation: inner-glow 2s infinite linear;
+}
+
+input[type="checkbox"]:checked + label::after {
+    transform: translateX(12px);
+    background-color: var(--accent-c);
+}
+
+
+@keyframes inner-glow {
+    0%   { box-shadow: var(--accent-c) 0 0 1px 1px inset, var(--accent-c) 0 0 2px 1px; }
+    50%  { box-shadow: var(--accent-c) 0 0 1px 1px inset, transparent 0 0 2px 1px; }
+    100% { box-shadow: var(--accent-c) 0 0 1px 1px inset, var(--accent-c) 0 0 2px 1px; }
+}
+
+@keyframes unterline-glow {
+    0%   { box-shadow: var(--accent-c) 0 3px 0 0; }
+    50%  { box-shadow: var(--accent-c) 0 1px 0 0; }
+    100% { box-shadow: var(--accent-c) 0 3px 0 0; }
+}
