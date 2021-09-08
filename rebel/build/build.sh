@@ -2,16 +2,16 @@
 
 build=0
 if [ -e ./.buildcount ]; then
-    ((build=`cat ./.buildcount`+1))    
+    ((build=`cat ./.buildcount`+1))
     echo $build > ./.buildcount
 fi
 
 export GOOS="linux"
 export GOARCH="amd64"
-filename="${appname}-linux-amd64.out"
 
 appname="rebel"
 version="1.0.${build}"
+filename="${appname}-linux-amd64.out"
 doRun=false
 isRelease=false
 
