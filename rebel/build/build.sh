@@ -6,9 +6,9 @@ if [ -e ./.buildcount ]; then
     echo $build > ./.buildcount
 fi
 
-export GOOS='linux'
-export GOARCH='amd64'
-filename="${appname}-linux-amd64"
+export GOOS="linux"
+export GOARCH="amd64"
+filename="${appname}-linux-amd64.out"
 
 appname="rebel"
 version="1.0.${build}"
@@ -37,5 +37,6 @@ else
 fi
 
 if [ $doRun = true ]; then
-    ./rebel-linux-amd64
+    #chmod +x rebel-linux-amd64.out
+    ./rebel-linux-amd64.out
 fi

@@ -64,7 +64,7 @@ func initializeCache() {
 
 	loadCacheDir("./front")
 
-	if entry, exist := (cache["index.html"]); exist {
+	if entry, exist := cache["index.html"]; exist {
 		cache[""] = entry
 		cache["/"] = entry
 	}

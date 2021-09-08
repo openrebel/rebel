@@ -1,3 +1,4 @@
+const isSecure = window.location.href.toLowerCase().startsWith("https://");
 const onMobile = (/Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent));
 
 const favicon   = document.getElementById("favicon");
@@ -96,7 +97,6 @@ function SetAccentColor(accent) {
 function Menu_UpdatePosition() {
     menu.style.visibility = menu_isopen ? "visible" : "hidden";
     cap.style.visibility = menu_isopen ? "visible" : "hidden";
-    cap.style.opacity = menu_isopen ? ".4" : "0";
 
     let left = parseInt(btnMenu.style.left);
 

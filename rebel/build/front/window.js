@@ -869,7 +869,7 @@ function StoreSession() {
 }
 
 function RestoreSession() {
-    let session = JSON.parse(localStorage.getItem("session"));
+    let session = JSON.parse(localStorage.getItem("session") ?? {});
 
     if (session === null) {
         const win = new Guide("first");
@@ -877,7 +877,7 @@ function RestoreSession() {
         win.win.style.top = "10%";
         win.win.style.width = "80%";
         win.win.style.height = "80%";
-    } 
+    }
 
     if (localStorage.getItem("restore_session") != "true") return;
     if (session == null || session.length == 0) return;    
@@ -885,9 +885,9 @@ function RestoreSession() {
     for (let i = 0; i < session.length; i++) {
         let win;
         switch (session[i].class) {
-            case "Settings"        : win = new Settings(session[i].args); break;
-            case "Netcalc"         : win = new Netcalc(session[i].args); break;
-            case "Passgen"         : win = new Passgen(session[i].args); break;
+            case "Settings"  : win = new Settings(session[i].args); break;
+            case "Netcalc"   : win = new Netcalc(session[i].args); break;
+            case "Passgen"   : win = new Passgen(session[i].args); break;
         }
 
         if (win) {

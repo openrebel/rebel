@@ -15,4 +15,8 @@
 # vendor/
 
 
+rebel.cfg
+.crt
+.key
+
 !.buildcount

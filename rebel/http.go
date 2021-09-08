@@ -14,27 +14,38 @@ var wsUpgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+var http_listeners []string
+var https_listeners []string
+var alias map[string]bool = make(map[string]bool)
+
 func initializeHttpListener() {
 	http.Handle("/", http.HandlerFunc(serve))
 	http.Handle("/ws", http.HandlerFunc(wsHandler))
 
-	func() {
-		log.Println("Initializing http listener on :80")
-		var err error = http.ListenAndServe(":80", nil)
-		if err != nil {
-			log.Fatalln(err)
-			return
-		}
-	}()
+	for _, e := range http_listeners {
+		var addr string = e
+		go func() {
+			log.Println("Initializing http listener on", addr)
+			var err error = http.ListenAndServe(addr, nil)
+			if err != nil {
+				log.Fatalln(err)
+				return
+			}
+		}()
+	}
 
-	/*func() {
-		log.Println("initializing https listener on :443")
-		var err error = http.ListenAndServeTLS(":443", "./tls/server.crt", "./tls/server.key", nil)
-		if err != nil {
-			log.Fatalln(err)
-			return
-		}
-	}()*/
+	for _, e := range https_listeners {
+		var addr string = e
+		go func() {
+			log.Println("initializing https listener on", addr)
+			var err error = http.ListenAndServeTLS(addr, "./tls/server.crt", "./tls/server.key", nil)
+			if err != nil {
+				log.Fatalln(err)
+				return
+			}
+		}()
+	}
+
 }
 
 func serve(w http.ResponseWriter, r *http.Request) {
@@ -95,9 +106,15 @@ func serve(w http.ResponseWriter, r *http.Request) {
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	wsUpgrader.CheckOrigin = func(r *http.Request) bool {
 		var origin string = r.Header.Get("Origin")
-		println("origin: ", origin)
-		return origin == "http://127.0.0.1:80"
-		//TODO:
+
+		origin = strings.TrimPrefix(origin, "https://")
+		origin = strings.TrimPrefix(origin, "http://")
+
+		if _, exist := alias[origin]; exist {
+			return true
+		}
+
+		return false
 	}
 
 	ws, err := wsUpgrader.Upgrade(w, r, nil)
@@ -106,7 +123,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Print("ws connected", ws)
+	log.Print("ws connected")
 
 	for {
 		messageType, bytes, err := ws.ReadMessage()
@@ -115,7 +132,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println(string(bytes))
+		//log.Println(string(bytes))
 
 		if err := ws.WriteMessage(messageType, bytes); err != nil {
 			log.Println(err)
