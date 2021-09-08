@@ -37,6 +37,6 @@ else
 fi
 
 if [ $doRun = true ]; then
-    #chmod +x rebel-linux-amd64.out
-    ./rebel-linux-amd64.out
+    #chmod +x $filename
+    ./$filename
 fi
