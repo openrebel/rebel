@@ -32,7 +32,7 @@ if [ $isRelease = true ]; then
 else
     go build \
     -o ./$filename \
-    -ldflags "-X main.product_release=true -X main.product_version=${version}" \
+    -ldflags "-X main.product_release=false -X main.product_version=${version}" \
     ./..
 fi
 
