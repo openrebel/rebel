@@ -83,8 +83,6 @@ func loadConfig() {
 		http_listeners = append(http_listeners, "127.0.0.1:80")
 	}
 
-	alias["localhost"] = true
-
 	for _, e := range http_listeners {
 		alias[e] = true
 		var split []string = strings.Split(e, ":")

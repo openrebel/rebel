@@ -16,7 +16,7 @@ var wsUpgrader = websocket.Upgrader{
 
 var http_listeners []string
 var https_listeners []string
-var alias map[string]bool = make(map[string]bool)
+var alias map[string]bool = map[string]bool{"localhost": true}
 
 func initializeHttpListener() {
 	http.Handle("/", http.HandlerFunc(serve))
