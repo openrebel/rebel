@@ -59,10 +59,10 @@ var CONTENT_TYPE map[string]string = map[string]string{
 	"zip":  "application/zip",
 }
 
-func initializeCache() {
+func InitializeCache() {
 	log.Println("Loading front end")
 
-	loadCacheDir("./front")
+	LoadCacheDir("./front")
 
 	if entry, exist := cache["index.html"]; exist {
 		cache[""] = entry
@@ -70,7 +70,7 @@ func initializeCache() {
 	}
 }
 
-func loadCacheDir(dirname string) {
+func LoadCacheDir(dirname string) {
 	files, err := ioutil.ReadDir(dirname)
 
 	if err != nil {
@@ -80,14 +80,14 @@ func loadCacheDir(dirname string) {
 
 	for _, f := range files {
 		if f.IsDir() {
-			loadCacheDir(dirname + "/" + f.Name())
+			LoadCacheDir(dirname + "/" + f.Name())
 		} else {
-			loadCacheFile(dirname + "/" + f.Name())
+			LoadCacheFile(dirname + "/" + f.Name())
 		}
 	}
 }
 
-func loadCacheFile(filename string) {
+func LoadCacheFile(filename string) {
 	bytes, err := ioutil.ReadFile(filename)
 
 	if err == nil {
@@ -105,11 +105,11 @@ func loadCacheFile(filename string) {
 
 		var entry CacheEntry
 		entry.raw = bytes
-		entry.gzip = gZipCompress(bytes)
+		entry.gzip = GZipCompress(bytes)
 		if product_release == "true" {
-			entry.brotli = brotliCompress(bytes, 11)
+			entry.brotli = BrotliCompress(bytes, 11)
 		} else {
-			entry.brotli = brotliCompress(bytes, 1)
+			entry.brotli = BrotliCompress(bytes, 1)
 		}
 		entry.contentType = contentType
 		cache[filename] = entry
@@ -120,7 +120,7 @@ func loadCacheFile(filename string) {
 	}
 }
 
-func gZipCompress(raw []byte) []byte {
+func GZipCompress(raw []byte) []byte {
 	var buffer bytes.Buffer
 	var gz *gzip.Writer = gzip.NewWriter(&buffer)
 
@@ -135,7 +135,7 @@ func gZipCompress(raw []byte) []byte {
 	return buffer.Bytes()
 }
 
-func brotliCompress(raw []byte, quality int) []byte {
+func BrotliCompress(raw []byte, quality int) []byte {
 	var buffer bytes.Buffer
 	var br *brotli.Writer = brotli.NewWriterOptions(&buffer, brotli.WriterOptions{Quality: quality})
 

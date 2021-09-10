@@ -18,9 +18,9 @@ var http_listeners []string
 var https_listeners []string
 var alias map[string]bool = map[string]bool{"localhost": true}
 
-func initializeHttpListener() {
-	http.Handle("/", http.HandlerFunc(serve))
-	http.Handle("/ws", http.HandlerFunc(wsHandler))
+func InitializeHttpListener() {
+	http.Handle("/", http.HandlerFunc(Serve))
+	http.Handle("/ws", http.HandlerFunc(WsHandler))
 
 	for _, e := range http_listeners {
 		var addr string = e
@@ -37,7 +37,7 @@ func initializeHttpListener() {
 	for _, e := range https_listeners {
 		var addr string = e
 		go func() {
-			log.Println("initializing https listener on", addr)
+			log.Println("Initializing https listener on", addr)
 			var err error = http.ListenAndServeTLS(addr, "./tls/server.crt", "./tls/server.key", nil)
 			if err != nil {
 				log.Fatalln(err)
@@ -45,10 +45,9 @@ func initializeHttpListener() {
 			}
 		}()
 	}
-
 }
 
-func serve(w http.ResponseWriter, r *http.Request) {
+func Serve(w http.ResponseWriter, r *http.Request) {
 	var acceptEncoding string = strings.ToLower(r.Header.Get("accept-encoding"))
 	var acceptBr bool = strings.Contains(acceptEncoding, "br")
 	var acceptGzip bool = strings.Contains(acceptEncoding, "gzip")
@@ -103,7 +102,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func wsHandler(w http.ResponseWriter, r *http.Request) {
+func WsHandler(w http.ResponseWriter, r *http.Request) {
 	wsUpgrader.CheckOrigin = func(r *http.Request) bool {
 		var origin string = r.Header.Get("Origin")
 

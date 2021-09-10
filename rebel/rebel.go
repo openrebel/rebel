@@ -34,9 +34,9 @@ func main() {
 	println(product_version)
 	println()
 
-	loadConfig()
-	initializeCache()
-	initializeHttpListener()
+	LoadConfig()
+	InitializeCache()
+	InitializeHttpListener()
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
@@ -45,7 +45,7 @@ func main() {
 
 }
 
-func loadConfig() {
+func LoadConfig() {
 	bytes, err := ioutil.ReadFile("./rebel.cfg")
 
 	if err == nil {
