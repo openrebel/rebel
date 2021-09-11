@@ -34,9 +34,9 @@ func main() {
 	println(product_version)
 	println()
 
-	LoadConfig()
-	InitializeCache()
-	InitializeHttpListener()
+	loadConfig()
+	initializeCache()
+	initializeHttpListener()
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
@@ -45,7 +45,7 @@ func main() {
 
 }
 
-func LoadConfig() {
+func loadConfig() {
 	bytes, err := ioutil.ReadFile("./rebel.cfg")
 
 	if err == nil {
@@ -81,9 +81,10 @@ func LoadConfig() {
 		log.Println("Failed to load configuration file. Loading the default configuration.")
 
 		http_listeners = append(http_listeners, "127.0.0.1:80")
+		alias["localhost"] = true
 	}
 
-	for _, e := range http_listeners {
+	for _, e := range http_listeners { //push http listeners
 		alias[e] = true
 		var split []string = strings.Split(e, ":")
 		if split[1] == "80" {
@@ -91,7 +92,7 @@ func LoadConfig() {
 		}
 	}
 
-	for _, e := range https_listeners {
+	for _, e := range https_listeners { //push https listeners
 		alias[e] = true
 		var split []string = strings.Split(e, ":")
 		if split[1] == "443" {

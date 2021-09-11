@@ -2,8 +2,8 @@
 
 build=0
 if [ -e ./.buildcount ]; then
-    ((build=`cat ./.buildcount`+1))
-    echo $build > ./.buildcount
+    build=`cat ./.buildcount`
+    echo "$(($build + 1))" > ./.buildcount
 fi
 
 export GOOS="linux"
