@@ -107,7 +107,6 @@ func IcmpRequestV6(addr string, timeout int, seq int) (*net.IPAddr, float32, err
 	}
 
 	//listening for icmp replies
-	println("list")
 	conn, err := icmp.ListenPacket("ip6:ipv6-icmp", "::0")
 	if err != nil {
 		return nil, 0, err
@@ -116,7 +115,6 @@ func IcmpRequestV6(addr string, timeout int, seq int) (*net.IPAddr, float32, err
 	defer conn.Close()
 
 	//icmp message
-	println("msg")
 	message := icmp.Message{
 		Type: ipv6.ICMPTypeEchoRequest,
 		Code: 0,
@@ -132,7 +130,6 @@ func IcmpRequestV6(addr string, timeout int, seq int) (*net.IPAddr, float32, err
 	}
 
 	//send it
-	println("sent it")
 	var start time.Time = time.Now()
 	n, err := conn.WriteTo(b, ipaddr)
 	if err != nil {
@@ -144,14 +141,12 @@ func IcmpRequestV6(addr string, timeout int, seq int) (*net.IPAddr, float32, err
 	var deadline time.Duration = time.Duration(timeout) * time.Millisecond
 
 	//wait for a reply
-	println("reply")
 	var reply []byte = make([]byte, 1500)
 	err = conn.SetReadDeadline(time.Now().Add(deadline))
 	if err != nil {
 		return ipaddr, 0, err
 	}
 
-	println("read")
 	n, peer, err := conn.ReadFrom(reply)
 	var rtt time.Duration = time.Since(start)
 	if err != nil {
@@ -162,7 +157,6 @@ func IcmpRequestV6(addr string, timeout int, seq int) (*net.IPAddr, float32, err
 	}
 
 	//done
-	println("done?")
 	rm, err := icmp.ParseMessage(PROTOCOL_ICMPv6, reply[:n])
 	if err != nil {
 		return ipaddr, 0, err
