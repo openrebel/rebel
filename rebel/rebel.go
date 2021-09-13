@@ -34,15 +34,14 @@ func main() {
 	println(product_version)
 	println()
 
+	server = *NewHttpServer()
 	loadConfig()
-	initializeCache()
-	initializeHttpListener()
+	server.Start()
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		scanner.Text()
 	}
-
 }
 
 func loadConfig() {
@@ -69,34 +68,34 @@ func loadConfig() {
 			var b string = strings.TrimSpace(split[1])
 
 			if a == "listen_http" {
-				http_listeners = append(http_listeners, b)
+				server.http_listeners = append(server.http_listeners, b)
 			} else if a == "listen_https" {
-				https_listeners = append(https_listeners, b)
+				server.https_listeners = append(server.https_listeners, b)
 			} else if a == "alias" {
-				alias[b] = true
+				server.alias[b] = true
 			}
 		}
 
 	} else {
 		log.Println("Failed to load configuration file. Loading the default configuration.")
 
-		http_listeners = append(http_listeners, "127.0.0.1:80")
-		alias["localhost"] = true
+		server.http_listeners = append(server.http_listeners, "127.0.0.1:80")
+		server.alias["localhost"] = true
 	}
 
-	for _, e := range http_listeners { //push http listeners
-		alias[e] = true
+	for _, e := range server.http_listeners {
+		server.alias[e] = true
 		var split []string = strings.Split(e, ":")
 		if split[1] == "80" {
-			alias[split[0]] = true
+			server.alias[split[0]] = true
 		}
 	}
 
-	for _, e := range https_listeners { //push https listeners
-		alias[e] = true
+	for _, e := range server.https_listeners {
+		server.alias[e] = true
 		var split []string = strings.Split(e, ":")
 		if split[1] == "443" {
-			alias[split[0]] = true
+			server.alias[split[0]] = true
 		}
 	}
 }

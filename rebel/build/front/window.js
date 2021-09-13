@@ -888,6 +888,7 @@ function RestoreSession() {
             case "Settings"  : win = new Settings(session[i].args); break;
             case "Netcalc"   : win = new Netcalc(session[i].args); break;
             case "Passgen"   : win = new Passgen(session[i].args); break;
+            case "Ping"      : win = new Ping(session[i].args); break;
         }
 
         if (win) {

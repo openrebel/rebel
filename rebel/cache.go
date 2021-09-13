@@ -11,14 +11,17 @@ import (
 	brotli "github.com/andybalholm/brotli"
 )
 
+type Cache struct {
+	path string
+	hash map[string]CacheEntry
+}
+
 type CacheEntry struct {
 	raw         []byte
 	gzip        []byte
 	brotli      []byte
 	contentType string
 }
-
-var cache map[string]CacheEntry = make(map[string]CacheEntry)
 
 var CONTENT_TYPE map[string]string = map[string]string{
 	/* text */
@@ -59,18 +62,24 @@ var CONTENT_TYPE map[string]string = map[string]string{
 	"zip":  "application/zip",
 }
 
-func initializeCache() {
-	log.Println("Loading front end")
+func NewCache(path string) *Cache {
+	var c *Cache = new(Cache)
+	c.path = path
+	c.hash = make(map[string]CacheEntry)
 
-	loadCacheDir("./front")
+	log.Printf("Loading front end: %s", path)
 
-	if entry, exist := cache["index.html"]; exist {
-		cache[""] = entry
-		cache["/"] = entry
+	loadCacheDir(c, c.path)
+
+	if entry, exist := c.hash["index.html"]; exist {
+		c.hash[""] = entry
+		c.hash["/"] = entry
 	}
+
+	return c
 }
 
-func loadCacheDir(dirname string) {
+func loadCacheDir(c *Cache, dirname string) {
 	files, err := ioutil.ReadDir(dirname)
 
 	if err != nil {
@@ -80,18 +89,18 @@ func loadCacheDir(dirname string) {
 
 	for _, f := range files {
 		if f.IsDir() {
-			loadCacheDir(dirname + "/" + f.Name())
+			loadCacheDir(c, dirname+"/"+f.Name())
 		} else {
-			loadCacheFile(dirname + "/" + f.Name())
+			loadCacheFile(c, dirname+"/"+f.Name())
 		}
 	}
 }
 
-func loadCacheFile(filename string) {
+func loadCacheFile(c *Cache, filename string) {
 	bytes, err := ioutil.ReadFile(filename)
 
 	if err == nil {
-		filename = filename[8:] //remove './front/'
+		filename = filename[len(c.path)+1:] //remove './front/'
 
 		var contentType string
 		var dot int = strings.LastIndex(filename, ".")
@@ -112,7 +121,7 @@ func loadCacheFile(filename string) {
 			entry.brotli = brotliCompress(bytes, 1)
 		}
 		entry.contentType = contentType
-		cache[filename] = entry
+		c.hash[filename] = entry
 
 	} else {
 		log.Fatalln("File reading error", err.Error())

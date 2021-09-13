@@ -64,7 +64,7 @@ func IcmpRequest(addr string, timeout int, seq int) (*net.IPAddr, float32, error
 	if err != nil {
 		return ipaddr, 0, err
 	} else if n != len(b) {
-		return ipaddr, 0, fmt.Errorf("got %v; want %v", n, len(b))
+		return ipaddr, 0, errors.New("buffer mismatch")
 	}
 
 	var deadline time.Duration = time.Duration(timeout) * time.Millisecond
@@ -96,7 +96,7 @@ func IcmpRequest(addr string, timeout int, seq int) (*net.IPAddr, float32, error
 		return ipaddr, float32(rtt.Nanoseconds()) / 1000000.0, nil
 
 	default:
-		return ipaddr, 0, fmt.Errorf("got %+v from %v; want echo reply", rm, peer)
+		return ipaddr, 0, fmt.Errorf("%+v from %v", rm, peer)
 	}
 }
 
@@ -135,7 +135,7 @@ func IcmpRequestV6(addr string, timeout int, seq int) (*net.IPAddr, float32, err
 	if err != nil {
 		return ipaddr, 0, err
 	} else if n != len(b) {
-		return ipaddr, 0, fmt.Errorf("got %v; want %v", n, len(b))
+		return ipaddr, 0, errors.New("buffer mismatch")
 	}
 
 	var deadline time.Duration = time.Duration(timeout) * time.Millisecond
@@ -167,6 +167,6 @@ func IcmpRequestV6(addr string, timeout int, seq int) (*net.IPAddr, float32, err
 		return ipaddr, float32(rtt.Nanoseconds()) / 1000000.0, nil
 
 	default:
-		return ipaddr, 0, fmt.Errorf("got %+v from %v; want echo reply", rm, peer)
+		return ipaddr, 0, fmt.Errorf("%+v from %v", rm, peer)
 	}
 }

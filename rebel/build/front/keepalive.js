@@ -6,7 +6,7 @@ function InitAliveSocket() {
     server = server.replace("http://", "");
     if (server.indexOf("/") > 0) server = server.substring(0, server.indexOf("/"));
 
-    this.ws = new WebSocket((isSecure ? "wss://" : "ws://") + server + "/ws");
+    this.ws = new WebSocket((isSecure ? "wss://" : "ws://") + server + "/ws/keepalive");
 
     this.ws.onopen = () => {
         setTimeout(() => {

@@ -14,15 +14,30 @@ var wsUpgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-var http_listeners []string
-var https_listeners []string
-var alias map[string]bool = make(map[string]bool)
+var server HttpServer
 
-func initializeHttpListener() {
+type HttpServer struct {
+	http_listeners  []string
+	https_listeners []string
+	alias           map[string]bool
+	cache           Cache
+}
+
+func NewHttpServer() *HttpServer {
+	var s *HttpServer = new(HttpServer)
+
 	http.Handle("/", http.HandlerFunc(serve))
-	http.Handle("/ws", http.HandlerFunc(wsHandler))
+	http.Handle("/ws/keepalive", http.HandlerFunc(wsHandler))
+	http.Handle("/ws/ping", http.HandlerFunc(wsHandler))
 
-	for _, e := range http_listeners {
+	s.alias = make(map[string]bool)
+	s.cache = *NewCache("./front")
+
+	return s
+}
+
+func (s *HttpServer) Start() {
+	for _, e := range s.http_listeners {
 		var addr string = e
 		go func() {
 			log.Println("Initializing http listener on", addr)
@@ -34,10 +49,10 @@ func initializeHttpListener() {
 		}()
 	}
 
-	for _, e := range https_listeners {
+	for _, e := range s.https_listeners {
 		var addr string = e
 		go func() {
-			log.Println("initializing https listener on", addr)
+			log.Println("Initializing https listener on", addr)
 			var err error = http.ListenAndServeTLS(addr, "./tls/server.crt", "./tls/server.key", nil)
 			if err != nil {
 				log.Fatalln(err)
@@ -45,7 +60,6 @@ func initializeHttpListener() {
 			}
 		}()
 	}
-
 }
 
 func serve(w http.ResponseWriter, r *http.Request) {
@@ -72,7 +86,7 @@ func serve(w http.ResponseWriter, r *http.Request) {
 		var buffer *[]byte
 		var status int
 
-		if entry, exist := (cache[file]); exist {
+		if entry, exist := (server.cache.hash[file]); exist {
 			status = http.StatusOK
 
 			if acceptBr {
@@ -110,7 +124,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		origin = strings.TrimPrefix(origin, "https://")
 		origin = strings.TrimPrefix(origin, "http://")
 
-		if _, exist := alias[origin]; exist {
+		if _, exist := server.alias[origin]; exist {
 			return true
 		}
 
