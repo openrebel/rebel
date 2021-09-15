@@ -3,7 +3,9 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net"
+	"net/http"
 	"os"
 	"time"
 
@@ -17,24 +19,19 @@ const (
 	PROTOCOL_ICMPv6 = 58
 )
 
-func DnsResolve(addr string) (*net.IPAddr, error) {
-	return net.ResolveIPAddr("ip4", addr)
-}
-
-func DnsResolveIPv6(addr string) (*net.IPAddr, error) {
-	return net.ResolveIPAddr("ip6", addr)
-}
-
 func DnsLookup(host string) ([]net.IP, error) {
 	return net.LookupIP(host)
 }
 
-func IcmpRequest(addr string, timeout int, seq int) (*net.IPAddr, float32, error) {
-	ipaddr, err := DnsResolve(addr)
-	if err != nil {
-		return nil, 0, err
+func IcmpRequestAndResolve(addr string, timeout int, seq int) (*net.IPAddr, float32, error) {
+	ipaddr, err := net.ResolveIPAddr("ip4", addr)
+	if err == nil {
+		return IcmpRequest(ipaddr, timeout, seq)
 	}
+	return nil, 0, err
+}
 
+func IcmpRequest(ipaddr *net.IPAddr, timeout int, seq int) (*net.IPAddr, float32, error) {
 	//listening for icmp replies
 	conn, err := icmp.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
@@ -100,12 +97,15 @@ func IcmpRequest(addr string, timeout int, seq int) (*net.IPAddr, float32, error
 	}
 }
 
-func IcmpRequestV6(addr string, timeout int, seq int) (*net.IPAddr, float32, error) {
-	ipaddr, err := DnsResolveIPv6(addr)
-	if err != nil {
-		return nil, 0, err
+func IcmpRequestV6AndResolve(addr string, timeout int, seq int) (*net.IPAddr, float32, error) {
+	ipaddr, err := net.ResolveIPAddr("ip6", addr)
+	if err == nil {
+		return IcmpRequestV6(ipaddr, timeout, seq)
 	}
+	return nil, 0, err
+}
 
+func IcmpRequestV6(ipaddr *net.IPAddr, timeout int, seq int) (*net.IPAddr, float32, error) {
 	//listening for icmp replies
 	conn, err := icmp.ListenPacket("ip6:ipv6-icmp", "::0")
 	if err != nil {
@@ -169,4 +169,54 @@ func IcmpRequestV6(addr string, timeout int, seq int) (*net.IPAddr, float32, err
 	default:
 		return ipaddr, 0, fmt.Errorf("%+v from %v", rm, peer)
 	}
+}
+
+func WsPing(w http.ResponseWriter, r *http.Request) {
+	wsUpgrader.CheckOrigin = func(r *http.Request) bool {
+		return CheckOrigin(r)
+	}
+
+	ws, err := wsUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	var closed bool = false
+
+	var hosts []string
+	//var forceIpv6 bool = false
+	//var ttl byte = 64
+	var timeout int = 1000
+	var seq int = 0
+	var method string = "icmp"
+
+	go func() { //ping loop
+		for !closed {
+
+			if method == "icmp" {
+				for i := 0; i < len(hosts); i++ {
+					IcmpRequestAndResolve(hosts[i], timeout, seq)
+				}
+			}
+
+			time.Sleep(time.Duration(timeout))
+		}
+	}()
+
+	for { //communication loop
+		messageType, bytes, err := ws.ReadMessage()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		//log.Println(string(bytes))
+
+		if err := ws.WriteMessage(messageType, bytes); err != nil {
+			log.Println(err)
+			return
+		}
+	}
+
 }

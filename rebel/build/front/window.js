@@ -752,7 +752,7 @@ function Body_resize(event) {
 function Win_mousemove(event) {
     if ($w.active === null) return;
 
-    if (event.buttons != 1) win_mouseup(event);
+    if (event.buttons != 1) Win_mouseup(event);
 
     document.getSelection().removeAllRanges(); //remove all selections
 
@@ -871,14 +871,6 @@ function StoreSession() {
 function RestoreSession() {
     let session = JSON.parse(localStorage.getItem("session") ?? {});
 
-    if (session === null) {
-        const win = new Guide("first");
-        win.win.style.left = "10%";
-        win.win.style.top = "10%";
-        win.win.style.width = "80%";
-        win.win.style.height = "80%";
-    }
-
     if (localStorage.getItem("restore_session") != "true") return;
     if (session == null || session.length == 0) return;    
 
@@ -904,7 +896,6 @@ function RestoreSession() {
             }
         }
     }
-
 }
 
 setTimeout(() => {

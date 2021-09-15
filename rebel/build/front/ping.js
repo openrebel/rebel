@@ -1,3 +1,5 @@
+const PING_HISTORY_LEN = 120
+
 class Ping extends Console {
     constructor(args) {
         super();
@@ -9,11 +11,19 @@ class Ping extends Console {
             moveToBottom: false
         };
 
+        this.count = 0;
         this.hashtable = {};
+        this.request = "";
+        this.ws = null;
 
         this.SetTitle(this.args.method == "arp" ? "ARP ping" : "Ping");
         this.SetIcon("res/ping.svg");
 
+        this.list.onscroll = () => this.InvalidateRecyclerList();
+    }
+
+    AfterResize() { //override
+        this.InvalidateRecyclerList();
     }
 
     Push(name) { //override
@@ -103,25 +113,114 @@ class Ping extends Console {
 
         const name = document.createElement("div");
         name.className = "list-label";
-        name.innerHTML = hostname;
+        name.innerHTML = host;
         div.appendChild(name);
 
         const graph = document.createElement("div");
         graph.className = "list-graph";
+        graph.style.overflow = "hidden";
         div.appendChild(graph);
 
-        const msg = document.createElement("div");
-        msg.className = "list-msg";
-        div.appendChild(msg);
+        const canvas = document.createElement("canvas");
+        canvas.width = 800;
+        canvas.height = 40;
+        canvas.className = "list-graph";
+        graph.appendChild(canvas);
+
+        const status = document.createElement("div");
+        status.className = "list-status";
+        div.appendChild(status);
 
         const remove = document.createElement("div");
         remove.className = "list-remove";
         div.appendChild(remove);
+        
+        remove.onclick = () => { this.Remove(host); };
+
+        let history = [];
+        for (let i = 0; i < PING_HISTORY_LEN; i++) {
+            history.push(-1);
+        }
+
+        this.hashtable[host] = {
+            host: host,
+            element: div,
+            status: status,
+            graph: graph,
+            canvas: canvas,
+            history: history
+        };
+
+        this.request += this.count + ";";
+
+        if (this.ws != null && this.ws.readyState === 0) { //connection
+            this.count += 1;
+
+        } else if (this.ws != null && this.ws.readyState === 1) { //ready
+            this.ws.send("add:" + this.count + ";" + host);
+            this.count += 1;
+
+        } else {
+            this.Connect();
+            this.count += 1;
+        }
     }
 
     Remove(host) {
+        if (this.hashtable[host]) {
+            this.list.removeChild(this.hashtable[host].element);
+            delete this.hashtable[host];
+        }
+
+        
+        if (this.ws.readyState === 1) {
+            this.ws.send("remove:" + index);
+            if (this.request.length == 0) this.ws.close();
+        }
+
+        this.AfterResize();
+    }
+
+    Connect() {
+        let server = window.location.href;
+        server = server.replace("https://", "");
+        server = server.replace("http://", "");
+        if (server.indexOf("/") > 0) server = server.substring(0, server.indexOf("/"));
+
+        if (this.ws != null)
+            try {
+                this.ws.close();
+            } catch (error) { };
+
+        this.ws = new WebSocket((isSecure ? "wss://" : "ws://") + server + "/ws/ping");
+
+        this.ws.onopen = () => {
+
+        };
+
+        this.ws.onclose = () => {
+
+        };
+
+        this.ws.onmessage = event => {
+
+        };
+
+        //this.ws.onerror = error => { console.log(error); };        
+    }
+
+    DrawGraph(host) {
 
     }
 
+    InvalidateRecyclerList() { //override
+        for (let key in this.hashtable)
+            if (this.hashtable[key].element.offsetTop - this.list.scrollTop < -30 ||
+                this.hashtable[key].element.offsetTop - this.list.scrollTop > this.list.clientHeight) {
+                this.hashtable[key].graph.style.display = "none";
+            } else {
+                this.hashtable[key].graph.style.display = "initial";
+            }
+    }
 
 }

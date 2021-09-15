@@ -28,7 +28,7 @@ func NewHttpServer() *HttpServer {
 
 	http.Handle("/", http.HandlerFunc(serve))
 	http.Handle("/ws/keepalive", http.HandlerFunc(wsHandler))
-	http.Handle("/ws/ping", http.HandlerFunc(wsHandler))
+	http.Handle("/ws/ping", http.HandlerFunc(WsPing))
 
 	s.alias = make(map[string]bool)
 	s.cache = *NewCache("./front")
@@ -117,18 +117,22 @@ func serve(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func CheckOrigin(r *http.Request) bool {
+	var origin string = r.Header.Get("Origin")
+
+	origin = strings.TrimPrefix(origin, "https://")
+	origin = strings.TrimPrefix(origin, "http://")
+
+	if _, exist := server.alias[origin]; exist {
+		return true
+	}
+
+	return false
+}
+
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	wsUpgrader.CheckOrigin = func(r *http.Request) bool {
-		var origin string = r.Header.Get("Origin")
-
-		origin = strings.TrimPrefix(origin, "https://")
-		origin = strings.TrimPrefix(origin, "http://")
-
-		if _, exist := server.alias[origin]; exist {
-			return true
-		}
-
-		return false
+		return CheckOrigin(r)
 	}
 
 	ws, err := wsUpgrader.Upgrade(w, r, nil)
