@@ -11,13 +11,18 @@ class Ping extends Console {
             moveToBottom: false
         };
 
-        this.count = 0;
         this.hashtable = {};
-        this.request = "";
         this.ws = null;
 
         this.SetTitle(this.args.method == "arp" ? "ARP ping" : "Ping");
         this.SetIcon("res/ping.svg");
+
+        if (this.args.entries) { //restore previous session
+            let temp = this.args.entries;
+            this.args.entries = [];
+            for (let i = 0; i < temp.length; i++)
+                this.Add(temp[i]);
+        }
 
         this.list.onscroll = () => this.InvalidateRecyclerList();
     }
@@ -151,18 +156,19 @@ class Ping extends Console {
             history: history
         };
 
-        this.request += this.count + ";";
+        this.args.entries.push(host);
+        
+        this.txtInput.style.left = "8px";
+        this.txtInput.style.bottom = "8px";
+        this.txtInput.style.width = "calc(100% - 16px)";
 
         if (this.ws != null && this.ws.readyState === 0) { //connection
-            this.count += 1;
 
         } else if (this.ws != null && this.ws.readyState === 1) { //ready
-            this.ws.send("add:" + this.count + ";" + host);
-            this.count += 1;
+            this.ws.send("add:" + host);
 
         } else {
             this.Connect();
-            this.count += 1;
         }
     }
 
@@ -172,10 +178,14 @@ class Ping extends Console {
             delete this.hashtable[host];
         }
 
+        let index = this.args.entries.indexOf(host);
+        if (index > -1) {
+            this.args.entries.splice(index, 1);
+        }
         
         if (this.ws.readyState === 1) {
-            this.ws.send("remove:" + index);
-            if (this.request.length == 0) this.ws.close();
+            this.ws.send("remove:" + host);
+            if (this.args.entries.length == 0) this.ws.close();
         }
 
         this.AfterResize();
@@ -195,7 +205,18 @@ class Ping extends Console {
         this.ws = new WebSocket((isSecure ? "wss://" : "ws://") + server + "/ws/ping");
 
         this.ws.onopen = () => {
+            this.ws.send("timeout:" + this.args.timeout);
+            this.ws.send("method:" + this.args.method);
 
+            let i = 0;
+            while (i < this.args.entries.length) {
+                let req = "add:";
+                while (req.length < 768 && i < this.args.entries.length) {
+                    if (this.args.entries[i].length > 0) req += this.args.entries[i] + ";";
+                    i++;
+                }
+                this.ws.send(req);
+            }
         };
 
         this.ws.onclose = () => {
@@ -206,7 +227,7 @@ class Ping extends Console {
 
         };
 
-        //this.ws.onerror = error => { console.log(error); };        
+        //this.ws.onerror = error => { console.log(error); };
     }
 
     DrawGraph(host) {

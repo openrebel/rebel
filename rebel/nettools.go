@@ -7,6 +7,9 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/net/icmp"
@@ -19,25 +22,21 @@ const (
 	PROTOCOL_ICMPv6 = 58
 )
 
-func DnsLookup(host string) ([]net.IP, error) {
-	return net.LookupIP(host)
-}
-
-func IcmpRequestAndResolve(addr string, timeout int, seq int) (*net.IPAddr, float32, error) {
+func IcmpRequestAndResolve(addr string, timeout int, ttl int, seq int) (*net.IPAddr, float32, error) {
 	ipaddr, err := net.ResolveIPAddr("ip4", addr)
 	if err == nil {
-		return IcmpRequest(ipaddr, timeout, seq)
+		return IcmpRequest(ipaddr, timeout, ttl, seq)
 	}
 	return nil, 0, err
 }
 
-func IcmpRequest(ipaddr *net.IPAddr, timeout int, seq int) (*net.IPAddr, float32, error) {
+func IcmpRequest(ipaddr *net.IPAddr, timeout int, ttl int, seq int) (*net.IPAddr, float32, error) {
 	//listening for icmp replies
 	conn, err := icmp.ListenPacket("ip4:icmp", "0.0.0.0")
 	if err != nil {
 		return nil, 0, err
 	}
-	conn.IPv4PacketConn().SetTTL(64)
+	conn.IPv4PacketConn().SetTTL(ttl)
 	defer conn.Close()
 
 	//icmp message
@@ -97,15 +96,15 @@ func IcmpRequest(ipaddr *net.IPAddr, timeout int, seq int) (*net.IPAddr, float32
 	}
 }
 
-func IcmpRequestV6AndResolve(addr string, timeout int, seq int) (*net.IPAddr, float32, error) {
+func IcmpRequestV6AndResolve(addr string, timeout int, ttl int, seq int) (*net.IPAddr, float32, error) {
 	ipaddr, err := net.ResolveIPAddr("ip6", addr)
 	if err == nil {
-		return IcmpRequestV6(ipaddr, timeout, seq)
+		return IcmpRequestV6(ipaddr, timeout, ttl, seq)
 	}
 	return nil, 0, err
 }
 
-func IcmpRequestV6(ipaddr *net.IPAddr, timeout int, seq int) (*net.IPAddr, float32, error) {
+func IcmpRequestV6(ipaddr *net.IPAddr, timeout int, ttl int, seq int) (*net.IPAddr, float32, error) {
 	//listening for icmp replies
 	conn, err := icmp.ListenPacket("ip6:ipv6-icmp", "::0")
 	if err != nil {
@@ -185,35 +184,89 @@ func WsPing(w http.ResponseWriter, r *http.Request) {
 	var closed bool = false
 
 	var hosts []string
-	//var forceIpv6 bool = false
-	//var ttl byte = 64
-	var timeout int = 1000
 	var seq int = 0
+	var timeout int = 1000
+	var ttl int = 64
+	var interval int = 1000
 	var method string = "icmp"
+	var forceIpv6 bool = false
 
 	go func() { //ping loop
-		for !closed {
 
-			if method == "icmp" {
-				for i := 0; i < len(hosts); i++ {
-					IcmpRequestAndResolve(hosts[i], timeout, seq)
-				}
+		for !closed {
+			var wg sync.WaitGroup
+			for i := 0; i < len(hosts); i++ {
+
+				wg.Add(1)
+				go func(host string) {
+					defer wg.Done()
+					IcmpRequestAndResolve(host, timeout, ttl, seq)
+				}(hosts[i])
 			}
 
-			time.Sleep(time.Duration(timeout))
+			time.Sleep(time.Duration(interval))
+			wg.Wait()
+
+			seq++
 		}
+
 	}()
 
-	for { //communication loop
+	defer func() {
+		closed = true
+	}()
+
+	for !closed { //communication loop
 		messageType, bytes, err := ws.ReadMessage()
 		if err != nil {
-			log.Println(err)
+			closed = true
 			return
 		}
 
-		//log.Println(string(bytes))
+		var msg []string = strings.Split(string(bytes), ":")
+
+		if len(msg) < 2 {
+			continue
+		}
+
+		switch msg[0] {
+		case "add":
+			seq = 0
+			hosts = append(hosts, msg[1])
+
+		case "remove":
+			//TODO:
+
+		case "timeout":
+			if num, err := strconv.Atoi(msg[1]); err == nil {
+				timeout = num
+			}
+
+		case "interval":
+			if num, err := strconv.Atoi(msg[1]); err == nil {
+				interval = num
+			}
+
+		case "ttl":
+			if num, err := strconv.Atoi(msg[1]); err == nil {
+				ttl = num
+			}
+
+		case "method":
+			method = msg[1]
+
+		case "forceipv6":
+			forceIpv6 = (msg[1] == "true")
+		}
+
+		log.Println(msg, method, forceIpv6)
+
+		if closed {
+			return
+		}
 
 		if err := ws.WriteMessage(messageType, bytes); err != nil {
+			closed = true
 			log.Println(err)
 			return
 		}

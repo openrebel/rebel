@@ -76,9 +76,8 @@ func loadConfig() {
 			}
 		}
 
-	} else {
-		log.Println("Failed to load configuration file. Loading the default configuration.")
-
+	} else { //default config
+		log.Println("Failed to load configuration file. Loading default configuration.")
 		server.http_listeners = append(server.http_listeners, "127.0.0.1:80")
 		server.alias["localhost"] = true
 	}
