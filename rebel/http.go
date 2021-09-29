@@ -9,6 +9,12 @@ import (
 	websocket "github.com/gorilla/websocket"
 )
 
+const (
+	WEBSOCKET_TYPE_TEXT   int = 0
+	WEBSOCKET_TYPE_BINARY int = 1
+	WEBSOCKET_TYPE_CLOSE  int = 2
+)
+
 var wsUpgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,

@@ -175,9 +175,14 @@ func WsPing(w http.ResponseWriter, r *http.Request) {
 		return CheckOrigin(r)
 	}
 
-	ws, err := wsUpgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
+	var n func() = func() {
+		println("")
+	}
+	n()
+
+	ws, wsErr := wsUpgrader.Upgrade(w, r, nil)
+	if wsErr != nil {
+		log.Println(wsErr)
 		return
 	}
 
@@ -185,31 +190,51 @@ func WsPing(w http.ResponseWriter, r *http.Request) {
 
 	var hosts []string
 	var seq int = 0
-	var timeout int = 1000
 	var ttl int = 64
+	var timeout int = 1000
 	var interval int = 1000
 	var method string = "icmp"
-	var forceIpv6 bool = false
+	//var forceIpv6 bool = false
 
 	go func() { //ping loop
-
 		for !closed {
+			var results []string = make([]string, len(hosts))
+
+			var startTime time.Time = time.Now()
+
 			var wg sync.WaitGroup
 			for i := 0; i < len(hosts); i++ {
-
 				wg.Add(1)
-				go func(host string) {
+				go func(i int, host string) {
 					defer wg.Done()
-					IcmpRequestAndResolve(host, timeout, ttl, seq)
-				}(hosts[i])
+
+					ipaddr, rtt, icmpErr := IcmpRequestAndResolve(host, timeout, ttl, seq)
+
+					if icmpErr == nil {
+						results[i] = "\"" + host + "\":[\"" + ipaddr.String() + "\",\"" + fmt.Sprint(rtt) + "\"]"
+					} else {
+						results[i] = "\"" + host + "\":[\"" + icmpErr.Error() + "\"]"
+					}
+
+				}(i, hosts[i])
+			}
+			wg.Wait()
+
+			if writeErr := ws.WriteMessage(WEBSOCKET_TYPE_BINARY, []byte("{\"o\":{"+strings.Join(results, ",")+"}}")); writeErr != nil {
+				closed = true
+				log.Println(writeErr)
+				return
 			}
 
-			time.Sleep(time.Duration(interval))
-			wg.Wait()
+			var endTime time.Time = time.Now()
+
+			var sleepTime = int64(interval) - endTime.Sub(startTime).Milliseconds()
+			if sleepTime > 0 {
+				time.Sleep(time.Duration(sleepTime * 1000000))
+			}
 
 			seq++
 		}
-
 	}()
 
 	defer func() {
@@ -217,8 +242,8 @@ func WsPing(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	for !closed { //communication loop
-		messageType, bytes, err := ws.ReadMessage()
-		if err != nil {
+		_, bytes, readErr := ws.ReadMessage()
+		if readErr != nil {
 			closed = true
 			return
 		}
@@ -228,14 +253,45 @@ func WsPing(w http.ResponseWriter, r *http.Request) {
 		if len(msg) < 2 {
 			continue
 		}
+		msg[0] = strings.TrimSpace(msg[0])
+
+		println(msg[0], msg[1])
 
 		switch msg[0] {
 		case "add":
 			seq = 0
-			hosts = append(hosts, msg[1])
+			var split []string = strings.Split(msg[1], ";")
+
+			for _, e := range split {
+				if len(e) == 0 {
+					continue
+				}
+
+				var exist bool = false
+				for _, e2 := range hosts {
+					if e2 == e {
+						exist = true
+						break
+					}
+				}
+
+				if !exist {
+					hosts = append(hosts, e)
+				}
+			}
 
 		case "remove":
-			//TODO:
+			var index int = -1
+			for i := 0; i < len(hosts); i++ {
+				if hosts[i] == msg[1] {
+					index = i
+					break
+				}
+			}
+
+			if index > -1 {
+				hosts = append(hosts[:index], hosts[index+1:]...)
+			}
 
 		case "timeout":
 			if num, err := strconv.Atoi(msg[1]); err == nil {
@@ -255,21 +311,20 @@ func WsPing(w http.ResponseWriter, r *http.Request) {
 		case "method":
 			method = msg[1]
 
-		case "forceipv6":
-			forceIpv6 = (msg[1] == "true")
+			//case "forceipv6":
+			//	forceIpv6 = (msg[1] == "true")
 		}
 
-		log.Println(msg, method, forceIpv6)
+		println(ttl, timeout)
+
+		if false {
+			println(msg, method)
+		}
 
 		if closed {
 			return
 		}
 
-		if err := ws.WriteMessage(messageType, bytes); err != nil {
-			closed = true
-			log.Println(err)
-			return
-		}
 	}
 
 }

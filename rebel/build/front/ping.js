@@ -27,6 +27,11 @@ class Ping extends Console {
         this.list.onscroll = () => this.InvalidateRecyclerList();
     }
 
+    Close() { //override
+        if (this.ws != null) this.ws.close();
+        super.Close();
+    }
+    
     AfterResize() { //override
         this.InvalidateRecyclerList();
     }
@@ -112,6 +117,13 @@ class Ping extends Console {
     }
 
     Add(host) {
+        if (host.length === 0) return;
+
+        if (this.hashtable[host]) {
+            this.list.appendChild(this.hashtable[host].element);
+            return;
+        }     
+
         const div = document.createElement("div");
         div.className = "list-element";
         this.list.appendChild(div);
