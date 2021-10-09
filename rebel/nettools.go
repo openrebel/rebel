@@ -208,7 +208,10 @@ func WsPing(w http.ResponseWriter, r *http.Request) {
 				go func(i int, host string) {
 					defer wg.Done()
 
-					ipaddr, rtt, icmpErr := IcmpRequestAndResolve(host, timeout, ttl, seq)
+					var ipaddr *net.IPAddr
+					var rtt float32
+					var icmpErr error
+					ipaddr, rtt, icmpErr = IcmpRequestAndResolve(host, timeout, ttl, seq)
 
 					if icmpErr == nil {
 						results[i] = "\"" + host + "\":[\"" + ipaddr.String() + "\",\"" + fmt.Sprint(rtt) + "\"]"
