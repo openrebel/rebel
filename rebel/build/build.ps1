@@ -36,7 +36,7 @@ foreach ($arch in $targetArch) {
     }
 }
 
-if ($args.Contains("--run") || $args.Contains("--run64")) {
+if ($args.Contains("--run") -Or $args.Contains("--run64")) {
     #Start-Process .\$($appname)-win-amd64.exe -WorkingDirectory .\
     .\rebel-win-amd64.exe
 } elseif ($args.Contains("--run32")) {
